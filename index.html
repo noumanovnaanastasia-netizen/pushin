@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пушин Кликер с Рулеткой</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7edd3;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: #5d4037;
+        }
+        .game-container {
+            max-width: 450px;
+            margin: 20px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        #score-display {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #click-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            transition: transform 0.1s;
+        }
+        #click-button:active {
+            transform: scale(0.92);
+        }
+        .cat-emoji {
+            font-size: 120px;
+            display: inline-block;
+        }
+        .section {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 2px dashed #d7ccc8;
+        }
+        .btn {
+            background-color: #8d6e63;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #6d4c41;
+        }
+        .btn:disabled {
+            background-color: #bcaaa4;
+            cursor: not-allowed;
+        }
+        #wheel-result {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d84315;
+            margin-top: 10px;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div id="score-display">🍪 Печеньки: <span id="score">0</span></div>
+    
+    <button id="click-button" onclick="makeClick()">
+        <span class="cat-emoji">🐱</span>
+    </button>
+    <p style="font-size: 14px; color: #8d6e63;">Клик дает: +<span id="click-power">1</span></p>
+
+    <div class="section">
+        <h3>Магазин вкусняшек</h3>
+        <button class="btn" id="upgrade-btn" onclick="buyUpgrade()">
+            Супер-клик (+1 к клику) — Цена: <span id="upgrade-cost">10</span> 🍪
+        </button>
+        <button class="btn" id="autoclick-btn" onclick="buyAutoclick()">
+            Помощник (+1 в сек) — Цена: <span id="autoclick-cost">50</span> 🍪
+        </button>
+    </div>
+
+    <div class="section">
+        <h3>🎡 Колесо Фортуны</h3>
+        <button class="btn" id="wheel-btn" onclick="spinWheel()">Крутить колесо (Бесплатно)</button>
+        <div id="wheel-result"></div>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let clickPower = 1;
+    let upgradeCost = 10;
+    
+    let autoclickers = 0;
+    let autoclickerCost = 50;
+    
+    let lastWheelTime = 0;
+
+    function makeClick() {
+        score += clickPower;
+        updateUI();
+    }
+
+    function buyUpgrade() {
+        if (score >= upgradeCost) {
+            score -= upgradeCost;
+            clickPower += 1;
+            upgradeCost = Math.round(upgradeCost * 1.5);
+            updateUI();
+        }
+    }
+
+    function buyAutoclick() {
+        if (score >= autoclickerCost) {
+            score -= autoclickerCost;
+            autoclickers += 1;
+            autoclickerCost = Math.round(autoclickerCost * 1.6);
+            updateUI();
+        }
+    }
+
+    function spinWheel() {
+        const now = Date.now();
+        if (now - lastWheelTime < 30000) {
+            const timeLeft = Math.ceil((30000 - (now - lastWheelTime)) / 1000);
+            document.getElementById('wheel-result').innerText = `⏳ Подождите еще ${timeLeft} сек.`;
+            return;
+        }
+
+        lastWheelTime = now;
+        document.getElementById('wheel-result').innerText = "🎡 Колесо крутится...";
+        document.getElementById('wheel-btn').disabled = true;
+
+        setTimeout(() => {
+            const prizes = [
+                { text: "🎉 Вы выиграли +50 печенек!", action: () => score += 50 },
+                { text: "🎉 Супер-приз! +200 печенек!", action: () => score += 200 },
+                { text: "💥 Ой! Мышка утащила 10 печенек...", action: () => score = Math.max(0, score - 10) },
+                { text: "🍬 Пушин сыт! Мощность клика временно +2!", action: () => {
+                    clickPower += 2;
+                    setTimeout(() => { clickPower -= 2; updateUI(); }, 15000);
+                }}
+            ];
+
+            const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
+            randomPrize.action();
+            document.getElementById('wheel-result').innerText = randomPrize.text;
+            
+            document.getElementById('wheel-btn').disabled = false;
+            updateUI();
+        }, 1500);
+    }
+
+    setInterval(() => {
+        if (autoclickers > 0) {
+            score += autoclickers;
+            updateUI();
+        }
+    }, 1000);
+
+    function updateUI() {
+        document.getElementById('score').innerText = score;
+        document.getElementById('click-power').innerText = clickPower;
+        document.getElementById('upgrade-cost').innerText = upgradeCost;
+        document.getElementById('autoclick-cost').innerText = autoclickerCost;
+        
+        document.getElementById('upgrade-btn').disabled = (score < upgradeCost);
+        document.getElementById('autoclick-btn').disabled = (score < autoclickerCost);
+    }
+
+    updateUI();
+</script>
+</body>
+</html>
