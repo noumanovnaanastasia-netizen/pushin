@@ -1,11 +1,7 @@
-// --- НАСТРОЙКА СЛУЧАЙНЫХ СОБЫТИЙ (РОБЛОКС-СТАЙЛ) ---
+// --- СИСТЕМА СЛУЧАЙНЫХ СОБЫТИЙ И МИНИ-ИГР (ПРОФЕССИОНАЛЬНАЯ ВЕРСИЯ) ---
 let eventTimer = 0;
-const EVENT_INTERVAL = 300; // Событие срабатывает каждые 5 минут (300 секунд)
+const TEST_EVENT_INTERVAL = 45; // Каждые 45 секунд спавнится случайный ивент для высокой динамики
 
-// Для тестов на GitHub сделаем появление быстрее — раз в 45 секунд, чтобы игроку не пришлось долго ждать
-const TEST_EVENT_INTERVAL = 45; 
-
-// База данных 8 уникальных событий с редкостями
 const EVENTS_DATABASE = [
     { id: 'storm', name: "Сахарный Шторм ⚡", rarity: "epic", desc: "Бешеный клик! Сила нажатия умножена на х5 на 20 сек!" },
     { id: 'mouse', name: "Нашествие мышей! 🐭", rarity: "common", desc: "Мышка прибежала! Быстро кликни на неё, пока она не утащила ягоды!" },
@@ -18,19 +14,16 @@ const EVENTS_DATABASE = [
 ];
 
 function initEventSystem() {
-    console.log("Система случайных событий запущена!");
+    console.log("События: Модуль успешно запущен!");
 }
 
 function updateEventLoop() {
     eventTimer++;
-    
-    // Используем тестовый интервал в 45 секунд, чтобы игру было интересно проверять на гитхабе
     if (eventTimer >= TEST_EVENT_INTERVAL) {
         eventTimer = 0;
         triggerRandomEvent();
     }
 
-    // Обработка активных бустов времени
     if (activeBuff.active) {
         let timeLeft = Math.ceil((activeBuff.endTime - Date.now()) / 1000);
         if (timeLeft <= 0) {
@@ -45,41 +38,35 @@ function updateEventLoop() {
 }
 
 function triggerRandomEvent() {
-    // Включаем победный фанфарный звук, чтобы привлечь игрока, если он отошел
     const fanfare = document.getElementById('sound-fanfare');
     if (fanfare) { fanfare.currentTime = 0; fanfare.play().catch(() => {}); }
 
-    // Роллим случайное событие на основе редкостей
     let rand = Math.random();
-    let selectedEvent = EVENTS_DATABASE[7]; // По умолчанию золотая печенька
+    let selectedEvent = EVENTS_DATABASE[7]; 
 
-    if (rand < 0.04) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'king');     // Король (Легендарное 4%)
-    else if (rand < 0.08) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'star'); // Звезда (Легендарное 4%)
-    else if (rand < 0.20) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'storm'); // Шторм (Эпическое 12%)
-    else if (rand < 0.35) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'package'); // Посылка (Редкое 15%)
-    else if (rand < 0.50) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'luck');   // Удача (Редкое 15%)
-    else if (rand < 0.70) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'mouse');  // Мышь (Обычное 20%)
-    else if (rand < 0.85) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'sleep');  // Сон (Обычное 15%)
-    else selectedEvent = EVENTS_DATABASE.find(e => e.id === 'cookie');                  // Печенька (Обычное 15%)
+    if (rand < 0.04) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'king');     
+    else if (rand < 0.08) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'star'); 
+    else if (rand < 0.20) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'storm'); 
+    else if (rand < 0.35) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'package'); 
+    else if (rand < 0.50) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'luck');   
+    else if (rand < 0.70) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'mouse');  
+    else if (rand < 0.85) selectedEvent = EVENTS_DATABASE.find(e => e.id === 'sleep');  
+    else selectedEvent = EVENTS_DATABASE.find(e => e.id === 'cookie');                  
 
-    // Выводим красивый текстовый баннер сверху экрана
     const banner = document.getElementById('event-banner');
     if (banner) {
         banner.className = `hidden-event`;
-        // Вызываем перерисовку
-        void banner.offsetWidth;
+        void banner.offsetWidth; 
         banner.innerHTML = `
-            <div style="font-size:0.8rem; letter-spacing:1px;">ВНЕЗАПНОЕ СОБЫТИЕ:</div>
-            <div style="font-size:1.2rem; font-weight:bold;">${selectedEvent.name}</div>
+            <div style="font-size:0.8rem; letter-spacing:1px; font-weight:bold;">ВНЕЗАПНОЕ СОБЫТИЕ:</div>
+            <div style="font-size:1.2rem; font-weight:bold; margin:2px 0;">${selectedEvent.name}</div>
             <div class="rarity-${selectedEvent.rarity}">Редкость: ${selectedEvent.rarity.toUpperCase()}</div>
             <div style="font-size:0.85rem; margin-top:3px; color:#5c4a4a;">${selectedEvent.desc}</div>
         `;
         banner.style.display = 'block';
-        // Через 6 секунд баннер плавно прячется
         setTimeout(() => { banner.style.display = 'none'; }, 6000);
     }
 
-    // Спавним интерактивный летающий объект на экране
     spawnEventObject(selectedEvent.id);
 }
 
@@ -91,39 +78,54 @@ function spawnEventObject(eventId) {
     obj.style.position = 'absolute';
     obj.style.cursor = 'pointer';
     obj.style.zIndex = '999';
-    obj.style.transition = 'all 0.5s ease';
+    obj.style.transition = 'all 0.4s ease';
     
-    // Случайное место на экране
     let posX = Math.floor(Math.random() * (window.innerWidth - 80));
-    let posY = Math.floor(Math.random() * (window.innerHeight - 250)) + 100;
+    let posY = Math.floor(Math.random() * (window.innerHeight - 260)) + 110;
     obj.style.left = posX + 'px';
     obj.style.top = posY + 'px';
 
-    // Внешний вид в зависимости от ивента (эмодзи)
-    if (eventId === 'cookie') { obj.innerText = '⭐🍪'; obj.style.fontSize = '3rem'; obj.onclick = () => { gameData.cookies += 150; alert("Поймано! +150 🍪"); obj.remove(); }; }
-    else if (eventId === 'star') { obj.innerText = '🌠'; obj.style.fontSize = '3.5rem'; obj.onclick = () => { gameData.inventory.berry += 20; gameData.inventory.blueberry += 10; alert("Звездный взрыв! На склад упало: 20 Смородины и 10 Голубики!"); obj.remove(); }; }
-    else if (eventId === 'mouse') { obj.innerText = '🐭'; obj.style.fontSize = '2.5rem'; obj.onclick = () => { alert("Ура! Ты прогнала мышь-воришку кликом, припасы в безопасности!"); obj.remove(); }; }
+    if (eventId === 'cookie') { 
+        obj.innerText = '⭐🍪'; obj.style.fontSize = '3rem'; 
+        obj.onclick = () => { gameData.cookies += 150; if (typeof showGameAlert === 'function') showGameAlert("🍪 Поймано!", "Ты поймала Золотую печеньку: +150 🍪!", "common"); obj.remove(); }; 
+    }
+    else if (eventId === 'star') { 
+        obj.innerText = '🌠'; obj.style.fontSize = '3.5rem'; 
+        obj.onclick = () => { gameData.inventory.berry += 20; gameData.inventory.blueberry += 10; if (typeof showGameAlert === 'function') showGameAlert("🌠 Звездный бум!", "Звезда взорвалась на складе! Получено: 20 Смородины и 10 Голубики!", "legendary"); obj.remove(); }; 
+    }
+    else if (eventId === 'mouse') { 
+        obj.innerText = '🐭'; obj.style.fontSize = '2.5rem'; 
+        obj.onclick = () => { if (typeof showGameAlert === 'function') showGameAlert("🐭 Прогнана!", "Ура! Ты успела закликать мышку! Припасы на складе в безопасности.", "common"); obj.remove(); }; 
+    }
     else if (eventId === 'package') {
         let clicks = 0; obj.innerText = '📦'; obj.style.fontSize = '3rem';
         obj.onclick = () => {
             clicks++; obj.style.transform = 'scale(1.2)'; setTimeout(() => obj.style.transform='scale(1)', 100);
-            if (clicks >= 5) { gameData.wheatSeeds += 3; gameData.berrySeeds += 1; alert("Посылка открыта! Найдено: 3 семени пшеницы и 1 семя смородины!"); obj.remove(); }
+            if (clicks >= 5) { gameData.wheatSeeds += 3; gameData.berrySeeds += 1; if (typeof showGameAlert === 'function') showGameAlert("📦 Посылка", "Ты открыла посылку от фаната! Внутри: 3 семени пшеницы и 1 семя смородины!", "rare"); obj.remove(); }
         };
     }
-    else if (eventId === 'storm') { obj.innerText = '⚡'; obj.style.fontSize = '3rem'; obj.onclick = () => { activeBuff.name = "Сахарный Шторм"; activeBuff.active = true; activeBuff.endTime = Date.now() + 20000; document.getElementById('buff-indicator').style.display = 'block'; obj.remove(); }; }
-    else if (eventId === 'king') { obj.innerText = '👑'; obj.style.fontSize = '3.5rem'; obj.onclick = () => { activeBuff.name = "Королевский визит"; activeBuff.active = true; activeBuff.endTime = Date.now() + 30000; document.getElementById('buff-indicator').style.display = 'block'; obj.remove(); }; }
-    else if (eventId === 'luck') { obj.innerText = '🎰'; obj.style.fontSize = '3rem'; obj.onclick = () => { gameData.lastWheelSpinTime = 0; alert("Рулетка перезагружена! Зайди в телефон и крути прямо сейчас!"); obj.remove(); }; }
+    else if (eventId === 'storm') { 
+        obj.innerText = '⚡'; obj.style.fontSize = '3rem'; 
+        obj.onclick = () => { activeBuff.name = "Сахарный Шторм"; activeBuff.active = true; activeBuff.endTime = Date.now() + 20000; document.getElementById('buff-indicator').style.display = 'block'; obj.remove(); }; 
+    }
+    else if (eventId === 'king') { 
+        obj.innerText = '👑'; obj.style.fontSize = '3.5rem'; 
+        obj.onclick = () => { activeBuff.name = "Королевский визит"; activeBuff.active = true; activeBuff.endTime = Date.now() + 30000; document.getElementById('buff-indicator').style.display = 'block'; obj.remove(); }; 
+    }
+    else if (eventId === 'luck') { 
+        obj.innerText = '🎰'; obj.style.fontSize = '3rem'; 
+        obj.onclick = () => { gameData.lastWheelSpinTime = 0; if (typeof showGameAlert === 'function') showGameAlert("🎰 Удача!", "Рулетка мгновенно перезарядилась! Зайди в телефон и крути скорее!", "rare"); obj.remove(); }; 
+    }
     else if (eventId === 'sleep') {
         let wakeClicks = 0; obj.innerText = '💤'; obj.style.fontSize = '2.5rem';
-        alert("⚠️ Ой! Пушин крепко заснул! Разбуди его кликами по значку сна, чтобы вернуть полный пассивный доход!");
+        if (typeof showGameAlert === 'function') showGameAlert("💤 Пушин уснул!", "Котик крепко заснул, пассивный доход снижен! Закликай значок сна 10 раз, чтобы разбудить его!", "common");
         obj.onclick = () => {
             wakeClicks++; if (typeof addXP === 'function') addXP(5);
-            if (wakeClicks >= 10) { alert("Пушин проснулся и готов кушать печеньки!"); obj.remove(); }
+            if (wakeClicks >= 10) { if (typeof showGameAlert === 'function') showGameAlert("🐱 Проснулся!", "Пушин проснулся и готов кушать печеньки! Доход восстановлен.", "common"); obj.remove(); }
         };
     }
 
     zone.appendChild(obj);
-    // Если игрок не нажал за 12 секунд — объект исчезает сам
     setTimeout(() => { if (obj.parentNode) obj.remove(); }, 12000);
 }
 
@@ -136,7 +138,7 @@ function spinWheel() {
     
     let now = Date.now();
     if (now - gameData.lastWheelSpinTime < 30000) {
-        alert("Колесо ещё перезаряжается!");
+        if (typeof showGameAlert === 'function') showGameAlert("⏳ Перезарядка", "Колесо ещё перезаряжается! Подожди немного.", "common");
         return;
     }
 
@@ -166,20 +168,20 @@ function spinWheel() {
         // Расчет приза (4 сектора по 90 градусов с сочными эмодзи)
         if (actualDegrees >= 0 && actualDegrees < 90) {
             gameData.cookies += 100;
-            alert("🎉 Сектор 🎁: Отличный приз! Получено +100 Печенек!");
+            if (typeof showGameAlert === 'function') showGameAlert("🎉 Сектор 🎁", "Отличный приз! Получено +100 Печенек!", "rare");
         } else if (actualDegrees >= 90 && actualDegrees < 180) {
             gameData.cookies = Math.max(0, gameData.cookies - 20);
-            alert("💥 Сектор 🐭: Ой-ой! Мышка утащила 20 печенек!");
+            if (typeof showGameAlert === 'function') showGameAlert("💥 Сектор 🐭", "Ой-ой! Мышка утащила 20 печенек!", "common");
         } else if (actualDegrees >= 180 && actualDegrees < 270) {
             activeBuff.name = "Турбо Клик";
             activeBuff.active = true;
             activeBuff.value = 3;
             activeBuff.endTime = Date.now() + 15000;
             if (document.getElementById('buff-indicator')) document.getElementById('buff-indicator').style.display = 'block';
-            alert("⚡ Сектор 🔥: Режим Турбо-Клика! Сила клика +3 на 15 секунд!");
+            if (typeof showGameAlert === 'function') showGameAlert("⚡ Сектор 🔥", "Режим Турбо-Клика! Сила клика +3 на 15 секунд!", "epic");
         } else {
             gameData.cookies += 400;
-            alert("👑 Сектор 💎: МЕГА СУПЕР-ПРИЗ! Найдено +400 Печенек!");
+            if (typeof showGameAlert === 'function') showGameAlert("👑 Сектор 💎", "МЕГА СУПЕР-ПРИЗ! Найдено +400 Печенек!", "legendary");
         }
 
         if (typeof updateUI === 'function') updateUI();
@@ -214,7 +216,6 @@ let mgScore = 0;
 let mgTimeLeft = 30;
 
 function triggerMinigame(gameType) {
-    // Закрываем телефон, чтобы открыть полноэкранный оверлей игры
     if (typeof togglePhone === 'function') togglePhone();
     
     const overlay = document.getElementById('minigame-overlay');
@@ -241,7 +242,6 @@ function runCatcherGame() {
     basket.style.display = 'block';
     basket.style.left = '50%';
     
-    // Управление корзинкой (тапы по левой или правой стороне экрана)
     window.onpointerdown = function(e) {
         let basketLeft = parseInt(basket.style.left) || 50;
         if (e.clientX < window.innerWidth / 2) {
@@ -251,17 +251,16 @@ function runCatcherGame() {
         }
     };
 
-    // Таймер игры
     mgTimerInterval = setInterval(() => {
         mgTimeLeft--;
         document.getElementById('mg-timer').innerText = mgTimeLeft;
         if (mgTimeLeft <= 0) stopMinigame('catcher');
     }, 1000);
 
-    // Падение еды с неба
     const emojis = ['🥐', '🌾', '🍇', '🧁', '🍪'];
     mgSpawnInterval = setInterval(() => {
         const field = document.getElementById('minigame-field');
+        if (!field) return;
         const food = document.createElement('div');
         food.className = 'falling-food';
         food.innerText = emojis[Math.floor(Math.random() * emojis.length)];
@@ -274,7 +273,6 @@ function runCatcherGame() {
             pos += 6;
             food.style.top = pos + 'px';
             
-            // Проверка столкновения с корзинкой
             let fieldHeight = field.clientHeight;
             if (pos >= fieldHeight - 60 && pos <= fieldHeight - 20) {
                 let foodLeft = parseFloat(food.style.left);
@@ -302,14 +300,12 @@ function runMilkGame() {
     
     field.innerHTML = `
         <div style="text-align:center; padding-top:40px; width:100%;">
-            <p>Нажми кнопку СТОП, когда шкала заполнится ровно до зеленой зоны!</p>
-            <div style="background:#333; width:60px; height:200px; margin:20px auto; border-radius:10px; position:relative; overflow:hidden;">
-                <!-- Зелёная идеальная зона -->
+            <p style="font-weight:bold; color:#4a3c3c; padding:0 10px;">Нажми кнопку СТОП, когда шкала заполнится ровно до зеленой зоны!</p>
+            <div style="background:#333; width:60px; height:200px; margin:20px auto; border-radius:12px; position:relative; overflow:hidden; border:3px solid #fff; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
                 <div style="background:#2ed573; position:absolute; bottom:140px; height:30px; width:100%; opacity:0.6;"></div>
-                <!-- Растущее молоко -->
                 <div id="milk-fill" style="background:white; position:absolute; bottom:0; width:100%; height:0%;"></div>
             </div>
-            <button class="buy-btn" id="milk-stop-btn" style="background:#74b9ff; font-size:1.3rem; padding:10px 30px;" onclick="stopMilkGameAction()">🛑 СТОП!</button>
+            <button class="buy-btn" id="milk-stop-btn" style="background:#74b9ff; font-size:1.3rem; padding:12px 35px; border-radius:16px;" onclick="stopMilkGameAction()">🛑 СТОП!</button>
         </div>
     `;
 
@@ -319,8 +315,8 @@ function runMilkGame() {
 
     mgSpawnInterval = setInterval(() => {
         milkHeight += 3 * direction;
-        if (milkHeight >= 100 || milkHeight <= 0) direction *= -1; // Движение туда-сюда
-        milkFill.style.height = milkHeight + '%';
+        if (milkHeight >= 100 || milkHeight <= 0) direction *= -1; 
+        if (milkFill) milkFill.style.height = milkHeight + '%';
     }, 40);
 
     mgTimerInterval = setInterval(() => {
@@ -333,18 +329,17 @@ function runMilkGame() {
 function stopMilkGameAction() {
     clearInterval(mgSpawnInterval);
     const milkFill = document.getElementById('milk-fill');
-    let finalHeight = parseInt(milkFill.style.height);
+    let finalHeight = milkFill ? parseInt(milkFill.style.height) : 0;
 
-    // Идеальная зеленая зона находится между 70% и 85% высоты
     if (finalHeight >= 70 && finalHeight <= 85) {
-        mgScore = 50; // Максимальные очки за точный налив
-        alert("🥛 ИДЕАЛЬНО! Налито ровно полная миска! Получено максимальное комбо бонусов!");
+        mgScore = 50; 
+        if (typeof showGameAlert === 'function') showGameAlert("🥛 ИДЕАЛЬНО!", "Налита полная миска молока! Получено максимальное комбо бонусов!", "legendary");
     } else if (finalHeight > 85) {
         mgScore = 10;
-        alert("💦 Ой! Молоко перелилось через край! Пушин немного расстроен.");
+        if (typeof showGameAlert === 'function') showGameAlert("💦 Пролито", "Ой! Молоко перелилось через край! Пушин немного расстроен.", "common");
     } else {
         mgScore = 15;
-        alert("🥣 Маловато налито, но котик всё равно попьет.");
+        if (typeof showGameAlert === 'function') showGameAlert("🥣 Маловато", "Маловато налито, но котик всё равно попьет.", "common");
     }
     
     stopMinigame('milk');
@@ -357,19 +352,20 @@ function stopMinigame(type) {
 
     document.getElementById('minigame-overlay').style.display = 'none';
 
-    // Выдача крутых наград в зависимости от набранных очков
     let wheatPrize = Math.floor(mgScore / 3);
     let berryPrize = Math.floor(mgScore / 10);
     
     if (type === 'milk' && mgScore === 50) {
-        wheatPrize = 25; berryPrize = 5; // Фиксированный супер-бонус
+        wheatPrize = 25; berryPrize = 5; 
     }
 
     gameData.wheatSeeds += wheatPrize;
     gameData.berrySeeds += berryPrize;
     if (typeof addXP === 'function') addXP(mgScore * 2);
 
-    alert(`🎮 Игра завершена!\nТвоя награда за активность:\n🌾 Семена Пшеницы: +${wheatPrize} шт.\n🍇 Семена Смородины: +${berryPrize} шт.\n✨ Опыт Пушина: +${mgScore * 2} XP!`);
+    if (typeof showGameAlert === 'function') {
+        showGameAlert("🕹️ Игра окончена", `Награда за активность:\n🌾 Семена Пшеницы: +${wheatPrize} шт.\n🍇 Семена Смородины: +${berryPrize} шт.\n✨ Опыт Пушина: +${mgScore * 2} XP!`, "rare");
+    }
     
     if (typeof updateUI === 'function') updateUI();
     if (typeof saveGame === 'function') saveGame();
