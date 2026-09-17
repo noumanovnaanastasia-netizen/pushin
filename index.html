@@ -8,7 +8,7 @@
     <!-- Интеграция SDK Яндекс Игр -->
     <script src="https://yandex.ru"></script>
     
-    <!-- Подключаем стили нашей игры -->
+    <!-- Подключаем профессиональные стили игры -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,7 +16,16 @@
     <!-- SDK Кнопка Выхода -->
     <button id="exit-btn" onclick="exitGame()">Выйти ❌</button>
 
-    <!-- Главное Верхнее Табло Профиля -->
+    <!-- КРАСИВОЕ ИГРОВОЕ ОКНО УВЕДОМЛЕНИЙ (Кастомный Pop-up в стиле Brawl Stars) -->
+    <div id="custom-alert" class="alert-overlay">
+        <div class="alert-box">
+            <div id="alert-title">🎉 Уведомление</div>
+            <div id="alert-message">Добро пожаловать в игру!</div>
+            <button class="alert-close-btn" onclick="closeCustomAlert()">Отлично!</button>
+        </div>
+    </div>
+
+    <!-- Главное Верхнее Табло Профиля (Стиль Hamster Kombat) -->
     <div class="score-container">
         <div class="rank-badge" id="pusheen-rank">🐱 Уровень 1 (👶 Котёнок)</div>
         <div class="xp-bar-container">
@@ -27,7 +36,7 @@
         <div id="buff-indicator">🔥 Эффект: <span id="buff-name">Нет</span> (<span id="buff-timer">0</span>с)</div>
     </div>
 
-    <!-- Всплывающий баннер для Роблокс-ивентов со звуком -->
+    <!-- Всплывающий баннер для Роблокс-ивентов -->
     <div id="event-banner" class="hidden-event"></div>
     <div id="floating-event-zone"></div>
 
@@ -94,7 +103,7 @@
         <div class="shop-scroll" id="home-furniture-items"></div>
     </div>
 
-    <!-- 🌾 ОГОРОД СЕМЯН -->
+    <!-- 🌾 ОГОРОД СЕМЯН (Визуальный стиль Plants vs Zombies) -->
     <div id="panel-farm" class="main-panel">
         <h2>🌾 Огород и Грядки</h2>
         <p>Уровень огорода разблокирует новые семена!</p>
@@ -119,7 +128,7 @@
         <button class="nav-tab-btn phone-trigger-btn" onclick="togglePhone()">📱 Телефон</button>
     </div>
 
-    <!-- ЭКРАН ИНТЕРАКТИВНОЙ МИНИ-ИГРЫ (Перекрывает всё при запуске) -->
+    <!-- ЭКРАН ИНТЕРАКТИВНОЙ МИНИ-ИГРЫ -->
     <div id="minigame-overlay">
         <div id="minigame-header">
             <div>Очки: <span id="mg-score">0</span></div>
@@ -129,14 +138,25 @@
         <div id="basket-catcher">🧺</div>
     </div>
 
-    <!-- Звуковое сопровождение -->
+    <!-- Лицензионные звуковые эффекты игры -->
     <audio id="sound-click" src="https://google.com" preload="auto"></audio>
     <audio id="sound-meow" src="https://google.com" preload="auto"></audio>
     <audio id="sound-fanfare" src="https://google.com" preload="auto"></audio>
+    <audio id="sound-ui" src="https://google.com" preload="auto"></audio>
 
-    <!-- Подключение внешних файлов логики -->
-    <script src="game.js"></script>
+    <!-- ГЛОБАЛЬНЫЙ СКРИПТ ЯДРА ИГРЫ (Создает базу данных gameData ПЕРВЫМ) -->
+    <script>
+        let gameData = {
+            cookies: 0, clickPower: 1, clickUpgradeLvl: 1, clickUpgradeCost: 10, autoClickers: 0, autoClickerCost: 50,
+            level: 1, xp: 0, xpNeeded: 100, activeSkin: '🐱', ownedSkins: ['🐱'],
+            wheatSeeds: 5, berrySeeds: 0, blueberrySeeds: 0, inventory: { wheat: 0, berry: 0, blueberry: 0 },
+            lastWheelSpinTime: 0, lastSaveTime: Date.now()
+        };
+    </script>
+
+    <!-- Подключение дополнительных модулей -->
     <script src="farm.js"></script>
     <script src="events.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
