@@ -2,186 +2,549 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Пушин Кликер с Рулеткой</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Пушин-Кликер: Собери все вкусняшки!</title>
+    
+    <!-- Подключаем SDK Яндекс Игр -->
+    <script src="https://yandex.ru"></script>
+
     <style>
+        :root {
+            --bg-color: #f7ebe1;
+            --main-color: #dfb295;
+            --accent-color: #f3a683;
+            --text-color: #4a4a4a;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f7edd3;
-            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
-            padding: 20px;
-            color: #5d4037;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            overflow-x: hidden;
         }
-        .game-container {
-            max-width: 450px;
-            margin: 20px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        #score-display {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        #click-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            outline: none;
-            transition: transform 0.1s;
-        }
-        #click-button:active {
-            transform: scale(0.92);
-        }
-        .cat-emoji {
-            font-size: 120px;
-            display: inline-block;
-        }
-        .section {
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 2px dashed #d7ccc8;
-        }
-        .btn {
-            background-color: #8d6e63;
+
+        /* Кнопка закрытия игры (Яндекс) */
+        #exit-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #ff4757;
             color: white;
             border: none;
-            padding: 12px 20px;
-            font-size: 16px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Счётчик печенек */
+        .score-container {
+            text-align: center;
+            margin-top: 50px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .ps-per-sec {
+            font-size: 1rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Главная зона клика */
+        .click-zone {
+            position: relative;
+            margin: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 250px;
+            width: 250px;
+        }
+
+        #pusheen {
+            width: 220px;
+            height: 220px;
+            background: #d1ccc0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 100px;
+            cursor: pointer;
+            transition: transform 0.05s ease-in-out;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 8px solid white;
+        }
+
+        #pusheen:active {
+            transform: scale(0.92);
+        }
+
+        /* Всплывающие циферки клика */
+        .floating-number {
+            position: absolute;
+            font-weight: bold;
+            font-size: 24px;
+            color: #e67e22;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            z-index: 50;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1.2); }
+        }
+
+        /* Нижняя панель вкладок */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            background: white;
+            border: 2px solid var(--main-color);
+            padding: 8px 16px;
             border-radius: 10px;
             cursor: pointer;
-            margin: 5px;
             font-weight: bold;
         }
-        .btn:hover {
-            background-color: #6d4c41;
+        .tab-btn.active {
+            background: var(--main-color);
+            color: white;
         }
-        .btn:disabled {
-            background-color: #bcaaa4;
-            cursor: not-allowed;
+
+        /* Контейнер для контента панелей */
+        .panel {
+            display: none;
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
         }
-        #wheel-result {
-            font-size: 18px;
+        .panel.active { display: block; }
+
+        /* Магазин и Улучшения */
+        .shop-item, .wheel-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #f1f2f6;
+        }
+        .shop-item:last-child { border-bottom: none; }
+        .item-info h3 { margin: 0; font-size: 1.1rem; }
+        .item-info p { margin: 3px 0 0 0; font-size: 0.85rem; color: #7f8c8d; }
+        .buy-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
             font-weight: bold;
-            color: #d84315;
-            margin-top: 10px;
-            min-height: 24px;
+            cursor: pointer;
         }
+        .buy-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+
+        /* Колесо Фортуны */
+        .wheel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .wheel-visual {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #2f3542;
+            position: relative;
+            background: conic-gradient(
+                #ff6b6b 0deg 90deg, 
+                #1e90ff 90deg 180deg, 
+                #2ed573 180deg 270deg, 
+                #ffa502 270deg 360deg
+            );
+            transition: transform 3s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+        .wheel-pointer {
+            width: 0; height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid #2f3542;
+            margin-bottom: -10px;
+            z-index: 10;
+        }
+        
+        #buff-indicator {
+            color: #2ed573;
+            font-weight: bold;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .premium-btn { background-color: #fbc531; color: #2f3542; }
     </style>
 </head>
 <body>
 
-<div class="game-container">
-    <div id="score-display">🍪 Печеньки: <span id="score">0</span></div>
-    
-    <button id="click-button" onclick="makeClick()">
-        <span class="cat-emoji">🐱</span>
-    </button>
-    <p style="font-size: 14px; color: #8d6e63;">Клик дает: +<span id="click-power">1</span></p>
+    <button id="exit-btn" onclick="exitGame()">Выйти ❌</button>
 
-    <div class="section">
-        <h3>Магазин вкусняшек</h3>
-        <button class="btn" id="upgrade-btn" onclick="buyUpgrade()">
-            Супер-клик (+1 к клику) — Цена: <span id="upgrade-cost">10</span> 🍪
-        </button>
-        <button class="btn" id="autoclick-btn" onclick="buyAutoclick()">
-            Помощник (+1 в сек) — Цена: <span id="autoclick-cost">50</span> 🍪
-        </button>
+    <div class="score-container">
+        <h1>🍪 <span id="cookies-count">0</span></h1>
+        <div class="ps-per-sec">В секунду: +<span id="pps-count">0</span></div>
+        <div id="buff-indicator">🔥 Пушин сыт! Сила клика +2 (<span id="buff-timer">15</span>с)</div>
     </div>
 
-    <div class="section">
-        <h3>🎡 Колесо Фортуны</h3>
-        <button class="btn" id="wheel-btn" onclick="spinWheel()">Крутить колесо (Бесплатно)</button>
-        <div id="wheel-result"></div>
+    <div class="click-zone" id="click-zone">
+        <div id="pusheen" onclick="handlePusheenClick(event)">🐱</div>
     </div>
-</div>
 
-<script>
-    let score = 0;
-    let clickPower = 1;
-    let upgradeCost = 10;
-    
-    let autoclickers = 0;
-    let autoclickerCost = 50;
-    
-    let lastWheelTime = 0;
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('upgrades')">Магазин</button>
+        <button class="tab-btn" onclick="switchTab('wheel')">Рулетка</button>
+        <button class="tab-btn" onclick="switchTab('premium')">Премиум ⭐</button>
+    </div>
 
-    function makeClick() {
-        score += clickPower;
-        updateUI();
-    }
+    <div id="upgrades-panel" class="panel active">
+        <div class="shop-item">
+            <div class="item-info">
+                <h3>Супер-клик</h3>
+                <p>Клик дает больше печенек</p>
+            </div>
+            <button class="buy-btn" id="btn-upgrade-click" onclick="buyUpgradeClick()">Уровень <span id="click-lvl">1</span> (<span id="click-cost">10</span> 🍪)</button>
+        </div>
+        <div class="shop-item">
+            <div class="item-info">
+                <h3>Помощник (Котёнок)</h3>
+                <p>Приносит +1 🍪 в секунду автоматически</p>
+            </div>
+            <button class="buy-btn" id="btn-upgrade-autoclick" onclick="buyAutoClicker()">Купить (<span id="auto-cost">50</span> 🍪)</button>
+        </div>
+    </div>
 
-    function buyUpgrade() {
-        if (score >= upgradeCost) {
-            score -= upgradeCost;
-            clickPower += 1;
-            upgradeCost = Math.round(upgradeCost * 1.5);
-            updateUI();
-        }
-    }
+    <div id="wheel-panel" class="panel">
+        <div class="wheel-container">
+            <div class="wheel-pointer"></div>
+            <div id="wheel" class="wheel-visual"></div>
+            <button class="buy-btn" id="spin-btn" onclick="spinWheel()">Крутить бесплатно!</button>
+            <p id="wheel-timer-text" style="display:none; color:#7f8c8d;">Следующее вращение через: <span id="wheel-countdown">30</span>с</p>
+        </div>
+    </div>
 
-    function buyAutoclick() {
-        if (score >= autoclickerCost) {
-            score -= autoclickerCost;
-            autoclickers += 1;
-            autoclickerCost = Math.round(autoclickerCost * 1.6);
-            updateUI();
-        }
-    }
+    <div id="premium-panel" class="panel">
+        <div class="shop-item">
+            <div class="item-info">
+                <h3>Мешок Вкусняшек</h3>
+                <p>Сразу +1,000 печенек</p>
+            </div>
+            <button class="buy-btn premium-btn" onclick="buyPremiumItem('pack_1000', 5)">5 Ян</button>
+        </div>
+        <div class="shop-item">
+            <div class="item-info">
+                <h3>Королевское угощение</h3>
+                <p>Сразу +10,000 печенек</p>
+            </div>
+            <button class="buy-btn premium-btn" onclick="buyPremiumItem('pack_10000', 20)">20 Ян</button>
+        </div>
+    </div>
 
-    function spinWheel() {
-        const now = Date.now();
-        if (now - lastWheelTime < 30000) {
-            const timeLeft = Math.ceil((30000 - (now - lastWheelTime)) / 1000);
-            document.getElementById('wheel-result').innerText = `⏳ Подождите еще ${timeLeft} сек.`;
-            return;
-        }
+    <audio id="sound-click" src="https://google.com" preload="auto"></audio>
+    <audio id="sound-meow" src="https://google.com" preload="auto"></audio>
 
-        lastWheelTime = now;
-        document.getElementById('wheel-result').innerText = "🎡 Колесо крутится...";
-        document.getElementById('wheel-btn').disabled = true;
+    <script>
+    // ВСТАВЛЯЙ ВТОРУЮ ЧАСТЬ СЮДА (ПРЯМО ПОД ЭТОЙ СТРОКОЙ)
+        // --- Глобальные переменные состояния ---
+        let gameData = {
+            cookies: 0,
+            clickPower: 1,
+            clickUpgradeLvl: 1,
+            clickUpgradeCost: 10,
+            autoClickers: 0,
+            autoClickerCost: 50,
+            lastWheelSpinTime: 0
+        };
 
-        setTimeout(() => {
-            const prizes = [
-                { text: "🎉 Вы выиграли +50 печенек!", action: () => score += 50 },
-                { text: "🎉 Супер-приз! +200 печенек!", action: () => score += 200 },
-                { text: "💥 Ой! Мышка утащила 10 печенек...", action: () => score = Math.max(0, score - 10) },
-                { text: "🍬 Пушин сыт! Мощность клика временно +2!", action: () => {
-                    clickPower += 2;
-                    setTimeout(() => { clickPower -= 2; updateUI(); }, 15000);
-                }}
-            ];
+        let activeBuff = { active: false, endTime: 0 };
+        let ysdkInstance = null;
+        let paymentsInstance = null;
 
-            const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
-            randomPrize.action();
-            document.getElementById('wheel-result').innerText = randomPrize.text;
+        // --- Инициализация игры ---
+        window.onload = function() {
+            loadGame();
+            initYandexSDK();
             
-            document.getElementById('wheel-btn').disabled = false;
+            // Запуск автокликера (раз в секунду)
+            setInterval(gameLoop, 1000);
+            // Быстрое сохранение (раз в 3 секунды)
+            setInterval(saveGame, 3000);
+            
             updateUI();
-        }, 1500);
-    }
+            checkWheelCooldown();
+            setInterval(checkWheelCooldown, 1000); // Проверка таймера рулетки
+        };
 
-    setInterval(() => {
-        if (autoclickers > 0) {
-            score += autoclickers;
+        // --- Инициализация Яндекс SDK ---
+        function initYandexSDK() {
+            YaGames.init().then(ysdk => {
+                console.log('Yandex Games SDK Инициализирован');
+                ysdkInstance = ysdk;
+                
+                // Пробуем включить внутриигровые покупки (Премиум)
+                ysdk.getPayments({ signed: true }).then(_payments => {
+                    paymentsInstance = _payments;
+                }).catch(err => console.log('Покупки не поддерживаются или ошибка:', err));
+            }).catch(err => console.log('Ошибка инициализации SDK:', err));
+        }
+
+        // Кнопка выхода в каталог Яндекса
+        function exitGame() {
+            if (ysdkInstance) {
+                ysdkInstance.dispatchEvent(ysdkInstance.EVENTS.EXIT).then(() => {
+                    console.log('Выход успешен');
+                }).catch(err => {
+                    console.log('Ошибка при выходе:', err);
+                });
+            } else {
+                alert('Локальный тест: Выход сработал!');
+            }
+        }
+
+        // --- Механика клика и звуков ---
+        function handlePusheenClick(event) {
+            // Воспроизведение звуков
+            const clickSound = document.getElementById('sound-click');
+            const meowSound = document.getElementById('sound-meow');
+            
+            clickSound.currentTime = 0;
+            clickSound.play().catch(() => {});
+
+            // Мяуканье с шансом 20% при каждом клике
+            if (Math.random() < 0.2) {
+                meowSound.currentTime = 0;
+                meowSound.play().catch(() => {});
+            }
+
+            // Расчет силы клика с учетом баффа
+            let currentPower = gameData.clickPower;
+            if (activeBuff.active && Date.now() < activeBuff.endTime) {
+                currentPower += 2;
+            }
+
+            gameData.cookies += currentPower;
+            
+            // Эффект всплывающих цифр
+            createFloatingNumber(event.clientX, event.clientY, `+${currentPower}`);
             updateUI();
         }
-    }, 1000);
 
-    function updateUI() {
-        document.getElementById('score').innerText = score;
-        document.getElementById('click-power').innerText = clickPower;
-        document.getElementById('upgrade-cost').innerText = upgradeCost;
-        document.getElementById('autoclick-cost').innerText = autoclickerCost;
-        
-        document.getElementById('upgrade-btn').disabled = (score < upgradeCost);
-        document.getElementById('autoclick-btn').disabled = (score < autoclickerCost);
-    }
+        function createFloatingNumber(x, y, text) {
+            const container = document.getElementById('click-zone');
+            const num = document.createElement('div');
+            num.className = 'floating-number';
+            num.innerText = text;
+            
+            // Позиционируем относительно зоны клика
+            const rect = container.getBoundingClientRect();
+            num.style.left = (x - rect.left - 10) + 'px';
+            num.style.top = (y - rect.top - 20) + 'px';
+            
+            container.appendChild(num);
+            setTimeout(() => num.remove(), 600);
+        }
 
-    updateUI();
-</script>
+        // --- Экономика и Улучшения ---
+        function buyUpgradeClick() {
+            if (gameData.cookies >= gameData.clickUpgradeCost) {
+                gameData.cookies -= gameData.clickUpgradeCost;
+                gameData.clickUpgradeLvl++;
+                
+                // Шаг роста силы клика: +1, +2, +5
+                if (gameData.clickUpgradeLvl <= 3) gameData.clickPower += 1;
+                else if (gameData.clickUpgradeLvl <= 6) gameData.clickPower += 2;
+                else gameData.clickPower += 5;
+
+                gameData.clickUpgradeCost = Math.round(gameData.clickUpgradeCost * 1.5);
+                updateUI();
+                saveGame();
+            }
+        }
+        // МЕТКА: СЮДА МЫ ВСТАВИМ ЗАКЛЮЧИТЕЛЬНУЮ ЧАСТЬ 2.2
+        // --- Покупка автокликера ---
+        function buyAutoClicker() {
+            if (gameData.cookies >= gameData.autoClickerCost) {
+                gameData.cookies -= gameData.autoClickerCost;
+                gameData.autoClickers++;
+                gameData.autoClickerCost = Math.round(gameData.autoClickerCost * 1.4);
+                updateUI();
+                saveGame();
+            }
+        }
+
+        // --- Игровой цикл (Раз в секунду) ---
+        function gameLoop() {
+            // Добавление пассивного дохода
+            if (gameData.autoClickers > 0) {
+                gameData.cookies += gameData.autoClickers;
+                updateUI();
+            }
+
+            // Обработка таймера баффа от рулетки
+            if (activeBuff.active) {
+                let timeLeft = Math.ceil((activeBuff.endTime - Date.now()) / 1000);
+                if (timeLeft <= 0) {
+                    activeBuff.active = false;
+                    document.getElementById('buff-indicator').style.display = 'none';
+                } else {
+                    document.getElementById('buff-timer').innerText = timeLeft;
+                }
+            }
+        }
+
+        // --- Встроенная рулетка (Колесо Фортуны) ---
+        let isSpinning = false;
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            let now = Date.now();
+            if (now - gameData.lastWheelSpinTime < 30000) return; // Кулдаун 30 секунд
+
+            isSpinning = true;
+            gameData.lastWheelSpinTime = now;
+            saveGame();
+
+            const wheel = document.getElementById('wheel');
+            let randomDegrees = Math.floor(Math.random() * 360) + 1080; 
+            wheel.style.transform = `rotate(${randomDegrees}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                wheel.style.transition = 'none';
+                let actualDegrees = randomDegrees % 360;
+                wheel.style.transform = `rotate(${actualDegrees}deg)`;
+                setTimeout(() => wheel.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.3, 1)', 50);
+
+                // Определение приза на основе градусов
+                if (actualDegrees >= 0 && actualDegrees < 90) {
+                    gameData.cookies += 50;
+                    alert('🎉 Приз: Малый Супер-Приз! +50 Печенек!');
+                } else if (actualDegrees >= 90 && actualDegrees < 180) {
+                    gameData.cookies = Math.max(0, gameData.cookies - 10);
+                    alert('💥 Ой! Мышка утащила 10 печенек!');
+                } else if (actualDegrees >= 180 && actualDegrees < 270) {
+                    activeBuff.active = true;
+                    activeBuff.endTime = Date.now() + 15000;
+                    document.getElementById('buff-indicator').style.display = 'block';
+                    alert('🍬 Сытый Пушин! Сила клика увеличена на +2 на 15 секунд!');
+                } else {
+                    gameData.cookies += 200;
+                    alert('👑 МЕГА ПРИЗ! +200 Печенек!');
+                }
+
+                updateUI();
+                checkWheelCooldown();
+            }, 3000);
+        }
+
+        function checkWheelCooldown() {
+            const spinBtn = document.getElementById('spin-btn');
+            const timerText = document.getElementById('wheel-timer-text');
+            const countdown = document.getElementById('wheel-countdown');
+            
+            let now = Date.now();
+            let timePassed = now - gameData.lastWheelSpinTime;
+
+            if (timePassed < 30000 && !isSpinning) {
+                spinBtn.disabled = true;
+                timerText.style.display = 'block';
+                countdown.innerText = Math.ceil((30000 - timePassed) / 1000);
+            } else if (!isSpinning) {
+                spinBtn.disabled = false;
+                timerText.style.display = 'none';
+            }
+        }
+
+        // --- Премиум покупки за Яны ---
+        function buyPremiumItem(id, priceYans) {
+            if (paymentsInstance) {
+                paymentsInstance.purchase({ id: id }).then(purchase => {
+                    applyPremiumBenefit(id);
+                    alert('Спасибо за покупку!');
+                }).catch(err => {
+                    console.log('Покупка отменена или произошла ошибка:', err);
+                });
+            } else {
+                let confirmTest = confirm(`Локальный тест: Купить товар [${id}] за ${priceYans} Ян?`);
+                if (confirmTest) {
+                    applyPremiumBenefit(id);
+                }
+            }
+        }
+
+        function applyPremiumBenefit(id) {
+            if (id === 'pack_1000') gameData.cookies += 1000;
+            if (id === 'pack_10000') gameData.cookies += 10000;
+            updateUI();
+            saveGame();
+        }
+
+        // --- Система сохранения (LocalStorage) ---
+        function saveGame() {
+            localStorage.setItem('pusheen_clicker_save', JSON.stringify(gameData));
+        }
+
+        function loadGame() {
+            let saved = localStorage.getItem('pusheen_clicker_save');
+            if (saved) {
+                try {
+                    gameData = JSON.parse(saved);
+                } catch(e) {
+                    console.log("Ошибка загрузки сейва", e);
+                }
+            }
+        }
+
+        // --- Интерфейсная логика (Вкладки и UI) ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(`${tabId}-panel`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function updateUI() {
+            document.getElementById('cookies-count').innerText = gameData.cookies;
+            document.getElementById('pps-count').innerText = gameData.autoClickers;
+            
+            // Обновление Магазина кликов
+            document.getElementById('click-lvl').innerText = gameData.clickUpgradeLvl;
+            document.getElementById('click-cost').innerText = gameData.clickUpgradeCost;
+            document.getElementById('btn-upgrade-click').disabled = gameData.cookies < gameData.clickUpgradeCost;
+
+            // Обновление Магазина автокликеров
+            document.getElementById('auto-cost').innerText = gameData.autoClickerCost;
+            document.getElementById('btn-upgrade-autoclick').disabled = gameData.cookies < gameData.autoClickerCost;
+        }
+    </script>
 </body>
 </html>
