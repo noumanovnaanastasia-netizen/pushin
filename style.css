@@ -1,1 +1,518 @@
-hj
+:root {
+    --bg-color: #fcefe9;
+    --main-color: #f7a8b8;
+    --accent-color: #b5e2fa;
+    --text-color: #5c4a4a;
+    --card-bg: #ffffff;
+    --phone-bg: #fff0f5;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    user-select: none;
+    overflow-x: hidden;
+}
+
+/* Кнопка закрытия игры для Яндекса */
+#exit-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff6b81;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(255, 107, 129, 0.2);
+}
+
+/* Панель Профиля сверху */
+.score-container {
+    text-align: center;
+    margin-top: 20px;
+    background: var(--card-bg);
+    padding: 15px 25px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    width: 85%;
+    max-width: 400px;
+    z-index: 10;
+}
+
+.rank-badge {
+    background-color: var(--main-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.xp-bar-container {
+    background: #f1f2f6;
+    border-radius: 10px;
+    height: 10px;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+#xp-bar-fill {
+    background: linear-gradient(90deg, #ff7675, #fdcb6e);
+    width: 0%;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.score-container h1 {
+    margin: 5px 0;
+    font-size: 2.8rem;
+    color: #4a3c3c;
+}
+
+.ps-per-sec {
+    font-size: 0.9rem;
+    color: #a4b0be;
+}
+
+#buff-indicator {
+    margin-top: 8px;
+    font-weight: bold;
+    color: #2ed573;
+    background: #e3fcef;
+    padding: 4px 10px;
+    border-radius: 10px;
+    display: none;
+}
+
+/* Центральный игровой макет (Пушин + Быстрый Магазин) */
+.main-game-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 90px; /* Чтобы не перекрывалось нижними кнопками */
+}
+
+.click-zone {
+    position: relative;
+    margin: 20px 0;
+    cursor: pointer;
+}
+
+#pusheen {
+    font-size: 130px;
+    width: 200px;
+    height: 200px;
+    background: #ecd5c5;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.05s ease-in-out;
+    border: 8px solid white;
+    box-shadow: 0 15px 35px rgba(236, 213, 197, 0.4);
+}
+
+#pusheen:active {
+    transform: scale(0.9);
+}
+
+/* Циферки урона клика */
+.floating-number {
+    position: absolute;
+    font-weight: bold;
+    font-size: 26px;
+    color: #ff7675;
+    pointer-events: none;
+    animation: floatUp 0.6s ease-out forwards;
+    z-index: 100;
+}
+
+@keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-120px) scale(1.3); }
+}
+
+/* Панель быстрого магазина на главном экране */
+.quick-shop {
+    background: var(--card-bg);
+    width: 85%;
+    max-width: 400px;
+    border-radius: 24px;
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    text-align: center;
+}
+
+.quick-shop h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+
+.quick-btn {
+    background: var(--accent-color);
+    color: #4b6584;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.quick-btn:disabled {
+    background: #eceff1;
+    color: #b0bec5;
+    cursor: not-allowed;
+}
+
+/* МЕТКА_CSS_КОНЦА_ПЕРВОЙ_ЧАСТИ */
+/* НИЖНИЙ НАВИГАЦИОННЫЙ ИНТЕРФЕЙС (4 Кнопки) */
+.main-nav-tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 25px rgba(0,0,0,0.05);
+    z-index: 500;
+    padding: 0 10px;
+}
+
+.nav-tab-btn {
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #a4b0be;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s, transform 0.1s;
+}
+
+.nav-tab-btn.active {
+    color: var(--main-color);
+    transform: scale(1.05);
+}
+
+.phone-trigger-btn {
+    background: #ffa7c4;
+    color: white !important;
+    padding: 8px 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(255, 167, 196, 0.3);
+}
+
+/* ОСНОВНЫЕ ОКНА ИНТЕРФЕЙСА (Дом, Огород, Кухня) */
+.main-panel {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 70px;
+    background: var(--bg-color);
+    z-index: 400;
+    padding: 20px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.main-panel.active {
+    display: block;
+}
+
+.main-panel h2 {
+    margin-top: 40px;
+    text-align: center;
+    color: #4a3c3c;
+}
+
+/* Огород и грядки */
+.farm-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.farm-plot {
+    background: white;
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+    border: 3px solid #e2d2c7;
+}
+
+.farm-plot.locked {
+    background: #e2e2e2;
+    border-color: #cccccc;
+    opacity: 0.7;
+}
+
+/* Вкладки внутри Кухни */
+.shop-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.shop-scroll {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.shop-item {
+    background: white;
+    border-radius: 18px;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.item-info h3 { margin: 0; font-size: 1.05rem; }
+.item-info p { margin: 4px 0 0 0; font-size: 0.8rem; color: #a4b0be; }
+
+.buy-btn {
+    background: var(--main-color);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.buy-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+/* ИНТЕРФЕЙС ТЕЛЕФОНА (ИНТЕРФЕЙС СМАРТФОНА) */
+.phone-container {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    right: 0;
+    height: 80vh;
+    background: white;
+    border-top-left-radius: 35px;
+    border-top-right-radius: 35px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+    z-index: 600;
+    transition: bottom 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.phone-container.open {
+    bottom: 0;
+}
+
+.phone-screen {
+    background: var(--phone-bg);
+    width: 100%;
+    height: 100%;
+    border-radius: 25px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.phone-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+.phone-apps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 10px;
+}
+
+.app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 20px;
+    height: 80px;
+    font-size: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    cursor: pointer;
+}
+
+.app-icon span {
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-top: 5px;
+    color: var(--text-color);
+}
+
+/* Контент внутри запущенного приложения */
+.phone-app-content {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 40px; left: 15px; right: 15px; bottom: 60px;
+    background: white;
+    border-radius: 20px;
+    padding: 15px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.phone-app-content.active {
+    display: flex;
+}
+
+.app-back-btn {
+    align-self: flex-start;
+    background: #f1f2f6;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.phone-home-button {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    background: white;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* График биржи на HTML-холсте */
+#market-canvas {
+    background: #2f3542;
+    border-radius: 12px;
+    width: 100%;
+    height: 150px;
+    margin-top: 10px;
+}
+
+/* Анимация Колеса Рулетки */
+.wheel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.wheel-visual {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 6px solid #4a3c3c;
+    position: relative;
+    background: conic-gradient(
+        #ff7675 0deg 90deg, 
+        #74b9ff 90deg 180deg, 
+        #55efc4 180deg 270deg, 
+        #ffeaa7 270deg 360deg
+    );
+    transition: transform 3s cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+
+.wheel-pointer {
+    font-size: 1.8rem;
+    margin-bottom: -15px;
+    z-index: 10;
+}
+
+/* ЭКРАН ИНТЕРАКТИВНОЙ МИНИ-ИГРЫ */
+#minigame-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #ffeaa7;
+    z-index: 2000;
+    flex-direction: column;
+}
+
+#minigame-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #4a3c3c;
+}
+
+#minigame-field {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.falling-food {
+    position: absolute;
+    font-size: 2.5rem;
+    user-select: none;
+}
+
+#basket-catcher {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3.5rem;
+    transition: left 0.1s ease-out;
+}
+
+/* Стили редкостей для Роблокс-ивентов */
+.rarity-common { color: #7f8c8d; font-weight: bold; }
+.rarity-rare { color: #2980b9; font-weight: bold; }
+.rarity-epic { color: #8e44ad; font-weight: bold; }
+.rarity-legendary { color: #f1c40f; font-weight: bold; text-shadow: 0 0 5px rgba(241,196,15,0.5); }
