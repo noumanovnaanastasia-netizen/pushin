@@ -5,10 +5,16 @@
     --text-color: #5c4a4a;
     --card-bg: #ffffff;
     --phone-bg: #fff0f5;
+    
+    /* Цвета редкостей */
+    --rarity-common: #a4b0be;
+    --rarity-rare: #74b9ff;
+    --rarity-epic: #a55eea;
+    --rarity-legendary: #ffb8b8;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Comfortaa', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
@@ -37,7 +43,62 @@ body {
     box-shadow: 0 4px 10px rgba(255, 107, 129, 0.2);
 }
 
-/* Панель Профиля сверху */
+/* КАСТОМНОЕ ИГРОВОЕ ОКНО УВЕДОМЛЕНИЙ (Вместо alert) */
+.alert-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(74, 60, 60, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+}
+
+.alert-box {
+    background: white;
+    padding: 25px;
+    border-radius: 28px;
+    width: 80%;
+    max-width: 320px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    border: 4px solid var(--main-color);
+    animation: alertPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes alertPop {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+#alert-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #4a3c3c;
+}
+
+#alert-message {
+    font-size: 0.95rem;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.alert-close-btn {
+    background: var(--main-color);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(247, 168, 184, 0.4);
+}
+
+/* Панель Профиля сверху (Стиль Hamster Kombat) */
 .score-container {
     text-align: center;
     margin-top: 20px;
@@ -48,6 +109,7 @@ body {
     width: 85%;
     max-width: 400px;
     z-index: 10;
+    border: 3px solid white;
 }
 
 .rank-badge {
@@ -64,10 +126,11 @@ body {
 .xp-bar-container {
     background: #f1f2f6;
     border-radius: 10px;
-    height: 10px;
+    height: 12px;
     width: 100%;
     overflow: hidden;
     margin-bottom: 10px;
+    border: 1px solid #e6e6e6;
 }
 
 #xp-bar-fill {
@@ -93,19 +156,19 @@ body {
     font-weight: bold;
     color: #2ed573;
     background: #e3fcef;
-    padding: 4px 10px;
-    border-radius: 10px;
+    padding: 5px 12px;
+    border-radius: 12px;
     display: none;
 }
 
-/* Центральный игровой макет (Пушин + Быстрый Магазин) */
+/* Главная игровая зона */
 .main-game-layout {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     margin-top: 15px;
-    margin-bottom: 90px; /* Чтобы не перекрывалось нижними кнопками */
+    margin-bottom: 90px;
 }
 
 .click-zone {
@@ -123,13 +186,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform 0.05s ease-in-out;
+    transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 8px solid white;
     box-shadow: 0 15px 35px rgba(236, 213, 197, 0.4);
 }
 
 #pusheen:active {
-    transform: scale(0.9);
+    transform: scale(0.88);
 }
 
 /* Циферки урона клика */
@@ -141,6 +204,7 @@ body {
     pointer-events: none;
     animation: floatUp 0.6s ease-out forwards;
     z-index: 100;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 @keyframes floatUp {
@@ -148,7 +212,7 @@ body {
     100% { opacity: 0; transform: translateY(-120px) scale(1.3); }
 }
 
-/* Панель быстрого магазина на главном экране */
+/* Быстрый магазин */
 .quick-shop {
     background: var(--card-bg);
     width: 85%;
@@ -157,9 +221,10 @@ body {
     padding: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.03);
     text-align: center;
+    border: 2px solid #fff;
 }
 
-.quick-shop h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+.quick-shop h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #4a3c3c; }
 
 .quick-btn {
     background: var(--accent-color);
@@ -172,13 +237,21 @@ body {
     font-size: 0.95rem;
     margin-bottom: 8px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 4px 0px #95cde6;
+}
+
+.quick-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
 }
 
 .quick-btn:disabled {
     background: #eceff1;
     color: #b0bec5;
+    box-shadow: none;
     cursor: not-allowed;
+    transform: none;
 }
 
 /* МЕТКА_CSS_КОНЦА_ПЕРВОЙ_ЧАСТИ */
@@ -188,16 +261,17 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 70px;
+    height: 75px;
     background: white;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    border-top-left-radius: 24px;
-    border-top-right-radius: 24px;
-    box-shadow: 0 -5px 25px rgba(0,0,0,0.05);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.06);
     z-index: 500;
     padding: 0 10px;
+    border-top: 2px solid #fff;
 }
 
 .nav-tab-btn {
@@ -216,25 +290,22 @@ body {
 
 .nav-tab-btn.active {
     color: var(--main-color);
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
 .phone-trigger-btn {
-    background: #ffa7c4;
+    background: linear-gradient(135deg, #ffa7c4, #f7a8b8);
     color: white !important;
-    padding: 8px 16px;
-    border-radius: 16px;
-    box-shadow: 0 4px 10px rgba(255, 167, 196, 0.3);
+    padding: 10px 20px;
+    border-radius: 18px;
+    box-shadow: 0 5px 15px rgba(255, 167, 196, 0.4);
 }
 
 /* ОСНОВНЫЕ ОКНА ИНТЕРФЕЙСА (Дом, Огород, Кухня) */
 .main-panel {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 70px;
+    top: 0; left: 0; right: 0; bottom: 75px;
     background: var(--bg-color);
     z-index: 400;
     padding: 20px;
@@ -244,35 +315,57 @@ body {
 
 .main-panel.active {
     display: block;
+    animation: fadeInPanel 0.2s ease-out;
+}
+
+@keyframes fadeInPanel {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .main-panel h2 {
     margin-top: 40px;
     text-align: center;
     color: #4a3c3c;
+    font-size: 1.6rem;
 }
 
-/* Огород и грядки */
+/* ВИЗУАЛЬНЫЙ ОГОРОД (Стиль Plants vs. Zombies) */
 .farm-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     margin-top: 20px;
+    padding-bottom: 20px;
 }
 
 .farm-plot {
-    background: white;
-    border-radius: 20px;
-    padding: 15px;
+    background: #fff9f5;
+    border-radius: 24px;
+    padding: 18px 12px;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+    box-shadow: 0 8px 0px #d4bdae, 0 10px 20px rgba(0,0,0,0.05);
     border: 3px solid #e2d2c7;
+    position: relative;
+    transition: transform 0.1s;
+}
+
+.farm-plot:not(.locked):active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0px #d4bdae, 0 5px 10px rgba(0,0,0,0.05);
 }
 
 .farm-plot.locked {
     background: #e2e2e2;
     border-color: #cccccc;
-    opacity: 0.7;
+    box-shadow: 0 8px 0px #b5b5b5;
+    opacity: 0.75;
+}
+
+.farm-plot h4 {
+    margin: 8px 0 4px 0;
+    font-size: 1.05rem;
+    color: #4a3c3c;
 }
 
 /* Вкладки внутри Кухни */
@@ -286,51 +379,60 @@ body {
 .shop-scroll {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    padding-bottom: 30px;
 }
 
 .shop-item {
     background: white;
-    border-radius: 18px;
-    padding: 12px 15px;
+    border-radius: 20px;
+    padding: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+    border: 2px solid #fff;
 }
 
-.item-info h3 { margin: 0; font-size: 1.05rem; }
-.item-info p { margin: 4px 0 0 0; font-size: 0.8rem; color: #a4b0be; }
+.item-info h3 { margin: 0; font-size: 1.1rem; color: #4a3c3c; }
+.item-info p { margin: 4px 0 0 0; font-size: 0.85rem; color: #a4b0be; }
 
 .buy-btn {
     background: var(--main-color);
     color: white;
     border: none;
-    padding: 8px 14px;
-    border-radius: 10px;
+    padding: 10px 16px;
+    border-radius: 12px;
     font-weight: bold;
     cursor: pointer;
+    box-shadow: 0 4px 0px #d68797;
+    transition: transform 0.1s;
+}
+
+.buy-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
 }
 
 .buy-btn:disabled {
     background: #cccccc;
+    box-shadow: none;
     cursor: not-allowed;
+    transform: none;
 }
 
-/* ИНТЕРФЕЙС ТЕЛЕФОНА (ИНТЕРФЕЙС СМАРТФОНА) */
+/* ИНТЕРФЕЙС ПАСТЕЛЬНОГО СМАРТФОНА */
 .phone-container {
     position: fixed;
-    bottom: -100%;
-    left: 0;
-    right: 0;
-    height: 80vh;
+    bottom: -100%; left: 0; right: 0;
+    height: 85vh;
     background: white;
-    border-top-left-radius: 35px;
-    border-top-right-radius: 35px;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    box-shadow: 0 -10px 40px rgba(74, 60, 60, 0.2);
     z-index: 600;
     transition: bottom 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);
-    padding: 10px;
+    padding: 12px;
     box-sizing: border-box;
 }
 
@@ -342,29 +444,31 @@ body {
     background: var(--phone-bg);
     width: 100%;
     height: 100%;
-    border-radius: 25px;
+    border-radius: 30px;
     position: relative;
     display: flex;
     flex-direction: column;
     padding: 15px;
     box-sizing: border-box;
     overflow: hidden;
+    border: 3px solid #ffdeeb;
 }
 
 .phone-header {
     display: flex;
     justify-content: space-between;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: bold;
-    color: #aaa;
+    color: #cca4b5;
     margin-bottom: 20px;
+    padding: 0 5px;
 }
 
 .phone-apps-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 10px;
+    gap: 15px;
+    padding: 10px 5px;
 }
 
 .app-icon {
@@ -373,31 +477,38 @@ body {
     align-items: center;
     justify-content: center;
     background: white;
-    border-radius: 20px;
-    height: 80px;
-    font-size: 2rem;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    border-radius: 22px;
+    height: 85px;
+    font-size: 2.2rem;
+    box-shadow: 0 6px 12px rgba(255, 167, 196, 0.1);
     cursor: pointer;
+    border: 2px solid #fff;
+    transition: transform 0.1s;
+}
+
+.app-icon:active {
+    transform: scale(0.92);
 }
 
 .app-icon span {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: bold;
-    margin-top: 5px;
+    margin-top: 6px;
     color: var(--text-color);
 }
 
-/* Контент внутри запущенного приложения */
+/* Контент внутри приложений */
 .phone-app-content {
     display: none;
     flex-direction: column;
     position: absolute;
-    top: 40px; left: 15px; right: 15px; bottom: 60px;
+    top: 45px; left: 15px; right: 15px; bottom: 65px;
     background: white;
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 15px;
     box-sizing: border-box;
     overflow-y: auto;
+    border: 2px solid #fff;
 }
 
 .phone-app-content.active {
@@ -408,11 +519,12 @@ body {
     align-self: flex-start;
     background: #f1f2f6;
     border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
+    padding: 8px 14px;
+    border-radius: 10px;
     font-weight: bold;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    color: var(--text-color);
 }
 
 .phone-home-button {
@@ -420,63 +532,67 @@ body {
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
-    border: 2px solid #ddd;
+    border: 3px solid #ffdeeb;
     background: white;
     font-size: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 167, 196, 0.15);
 }
 
-/* График биржи на HTML-холсте */
+/* Линейный График Биржи */
 #market-canvas {
-    background: #2f3542;
-    border-radius: 12px;
+    background: #2b313e;
+    border-radius: 16px;
     width: 100%;
-    height: 150px;
+    height: 140px;
     margin-top: 10px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
 }
 
-/* Анимация Колеса Рулетки */
+/* Модернизированное Колесо Фортуны */
 .wheel-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .wheel-visual {
-    width: 180px;
-    height: 180px;
+    width: 190px;
+    height: 190px;
     border-radius: 50%;
-    border: 6px solid #4a3c3c;
+    border: 6px solid #5c4a4a;
     position: relative;
+    /* Яркие сектора */
     background: conic-gradient(
         #ff7675 0deg 90deg, 
         #74b9ff 90deg 180deg, 
         #55efc4 180deg 270deg, 
         #ffeaa7 270deg 360deg
     );
-    transition: transform 3s cubic-bezier(0.1, 0.8, 0.3, 1);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
 .wheel-pointer {
-    font-size: 1.8rem;
-    margin-bottom: -15px;
+    font-size: 2rem;
+    margin-bottom: -20px;
     z-index: 10;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
 }
 
-/* ЭКРАН ИНТЕРАКТИВНОЙ МИНИ-ИГРЫ */
+/* МИНИ-ИГРЫ */
 #minigame-overlay {
     display: none;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #ffeaa7;
+    background: linear-gradient(to bottom, #ffeaa7, #fcedc4);
     z-index: 2000;
     flex-direction: column;
 }
@@ -498,21 +614,22 @@ body {
 
 .falling-food {
     position: absolute;
-    font-size: 2.5rem;
+    font-size: 2.6rem;
     user-select: none;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
 #basket-catcher {
     position: absolute;
-    bottom: 20px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 3.5rem;
-    transition: left 0.1s ease-out;
+    font-size: 3.8rem;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
 }
 
-/* Стили редкостей для Роблокс-ивентов */
-.rarity-common { color: #7f8c8d; font-weight: bold; }
-.rarity-rare { color: #2980b9; font-weight: bold; }
-.rarity-epic { color: #8e44ad; font-weight: bold; }
-.rarity-legendary { color: #f1c40f; font-weight: bold; text-shadow: 0 0 5px rgba(241,196,15,0.5); }
+/* Стили рамок редкости как в Brawl Stars */
+.rarity-common { color: var(--rarity-common); font-weight: bold; }
+.rarity-rare { color: var(--rarity-rare); font-weight: bold; }
+.rarity-epic { color: var(--rarity-epic); font-weight: bold; }
+.rarity-legendary { color: #f1c40f; font-weight: bold; text-shadow: 0 0 8px rgba(241,196,15,0.4); }
